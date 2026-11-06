@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Covariance & Pearson Correlation — Interactive Lab</title>
+  <style>
+    :root { color-scheme: light; --ink:#17233c; --muted:#64748b; --blue:#2563eb; --blue-dark:#1d4ed8; --teal:#0f766e; --line:#dce4ee; --bg:#f3f6fb; --card:#fff; --orange:#db6a18; }
+    * {box-sizing:border-box} body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--ink)}
+    main{max-width:1270px;margin:0 auto;padding:30px 22px 44px} header{margin-bottom:24px} h1{font-size:clamp(1.75rem,3vw,2.65rem);line-height:1.15;margin:0 0 8px;letter-spacing:-.03em} p{line-height:1.5} .subtitle{color:var(--muted);max-width:900px;margin:0}
+    .layout{display:grid;grid-template-columns:minmax(0,1.7fr) minmax(300px,.95fr);gap:18px;align-items:start} .panel{background:var(--card);border:1px solid var(--line);border-radius:16px;box-shadow:0 4px 16px rgba(16,35,69,.045)} .visual{padding:18px 20px 16px}.right{display:grid;gap:16px}.stats{padding:20px}.controls{padding:20px}.foot{padding:20px;margin-top:18px}h2{font-size:1.12rem;margin:0 0 15px;letter-spacing:-.01em} .legend{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap}.helper{color:var(--muted);font-size:.88rem}.plot-frame{position:relative;width:100%; margin-top:8px}svg{display:block;width:100%;height:auto;touch-action:none;user-select:none}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin:13px 0 3px}.button{border:1px solid #cbd5e1;background:white;color:#24344e;border-radius:9px;padding:10px 13px;font-weight:650;font-size:.9rem;cursor:pointer;transition:background .15s,border .15s}.button:hover{background:#eff6ff;border-color:#93c5fd}.button.primary{background:var(--blue);color:white;border-color:var(--blue)}.button.primary:hover{background:var(--blue-dark)}.button[aria-pressed="true"]{background:#dbeafe;border-color:#60a5fa;color:#1d4ed8}.button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid #93c5fd;outline-offset:2px}
+    .numbers{display:grid;grid-template-columns:1fr 1fr;gap:10px}.stat{background:#f8fafc;border:1px solid #e4eaf2;border-radius:12px;padding:15px}.stat-name{font-size:.82rem;color:var(--muted);font-weight:650}.stat-value{font-size:clamp(1.35rem,2.4vw,2rem);font-weight:750;letter-spacing:-.03em;margin-top:4px;font-variant-numeric:tabular-nums}.stat-desc{font-size:.8rem;color:var(--muted);margin-top:3px}.explain{font-size:.93rem;line-height:1.55;margin:13px 0 0}.formula{border-radius:9px;background:#f1f5f9;padding:12px 13px;font-size:.91rem;line-height:1.7;margin-top:13px}.formula code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;white-space:normal}.note{font-size:.86rem;color:#4b5c75;line-height:1.55}.form-group{margin:15px 0 0}label{font-size:.88rem;font-weight:650;display:block;margin-bottom:7px}select{width:100%;border:1px solid #cbd5e1;background:white;border-radius:8px;padding:11px 10px;font:inherit;color:var(--ink)}.scale-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.status{font-size:.85rem;color:var(--muted);min-height:1.3em;margin-top:10px}.footergrid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.footergrid strong{display:block;margin-bottom:5px}.footergrid p{font-size:.88rem;color:#485a76;margin:0}.axis-text{font-size:14px;fill:#41536c}.tick-text{font-size:12px;fill:#64748b}.gridline{stroke:#e7edf5;stroke-width:1}.regline{stroke:#ea580c;stroke-width:2.5;stroke-dasharray:7 4;pointer-events:none}.meanline{stroke:#0f766e;stroke-width:1.6;stroke-dasharray:4 5;opacity:.85;pointer-events:none}.dot{fill:#2563eb;stroke:white;stroke-width:2;cursor:grab;transition:fill .1s}.dot:hover,.dot.active{fill:#1d4ed8;stroke:#93c5fd;stroke-width:4;cursor:grabbing}.hint-row{display:flex;gap:12px;justify-content:space-between;flex-wrap:wrap;margin-top:6px}.chip{display:inline-flex;align-items:center;gap:6px;color:#475569;font-size:.78rem}.key{height:10px;width:10px;border-radius:50%;background:#2563eb;display:inline-block}.linekey{height:0;width:20px;border-top:2.5px dashed #ea580c;display:inline-block}.meankey{height:0;width:20px;border-top:2px dashed #0f766e;display:inline-block}@media(max-width:850px){.layout{grid-template-columns:1fr}.footergrid{grid-template-columns:1fr}}@media(max-width:480px){main{padding:18px 12px 26px}.visual,.stats,.controls,.foot{padding:15px}.numbers{gap:8px}.scale-grid{gap:7px}.button{padding:9px 10px;font-size:.82rem}}
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <h1>Covariance &amp; Pearson Correlation</h1>
+    <p class="subtitle">Move the points, change measurement units, and standardize the axes. Explore how covariance depends on units while Pearson's <em>r</em> does not.</p>
+  </header>
+  <div class="layout">
+    <section class="panel visual" aria-label="Interactive scatter plot">
+      <div class="legend"><h2 style="margin:0">Scatter plot</h2><span class="helper">Drag any blue point to change the data</span></div>
+      <div class="plot-frame"><svg id="plot" viewBox="0 0 750 560" role="img" aria-label="Scatter plot with draggable points, mean reference lines and regression line"></svg></div>
+      <div class="hint-row"><span class="chip"><span class="key"></span> Observations</span><span class="chip"><span class="linekey"></span> Regression line</span><span class="chip"><span class="meankey"></span> Means</span></div>
+      <div class="toolbar">
+        <button class="button primary" id="zToggle" aria-pressed="false">Switch axes to z-scores</button>
+        <button class="button" id="resetBtn">Reset example</button>
+      </div>
+      <p class="status" id="modeStatus" aria-live="polite">Raw values: axes show the selected measurement units.</p>
+    </section>
+    <div class="right">
+      <section class="panel stats">
+        <h2>Live statistics</h2>
+        <div class="numbers">
+          <div class="stat"><div class="stat-name">Sample covariance</div><div class="stat-value" id="covValue">—</div><div class="stat-desc" id="covUnit">X units × Y units</div></div>
+          <div class="stat"><div class="stat-name">Pearson correlation</div><div class="stat-value" id="rValue">—</div><div class="stat-desc">Always between −1 and +1</div></div>
+        </div>
+        <p class="explain" id="interpretation"></p>
+        <div class="formula"><strong>Covariance:</strong> <code>Σ[(xᵢ − x̄)(yᵢ − ȳ)] / (n − 1)</code><br><strong>Pearson:</strong> <code>r = Cov(X,Y) / (sₓ × sᵧ)</code></div>
+        <p class="note">When both axes are standardized using <em>sample</em> standard deviations, their sample covariance equals Pearson's <em>r</em>.</p>
+      </section>
+      <section class="panel controls">
+        <h2>Explore different relationships</h2>
+        <div class="form-group" style="margin-top:0"><label for="preset">Example dataset</label><select id="preset"><option value="strongPos">Strong positive relationship</option><option value="weakPos">Weak positive relationship</option><option value="strongNeg">Strong negative relationship</option><option value="weakNeg">Weak negative relationship</option><option value="none">Little or no linear relationship</option><option value="curve">Nonlinear relationship (U-shape)</option></select></div>
+        <div class="form-group"><label>Measurement units (raw mode)</label><div class="scale-grid"><div><label for="xScale" style="font-weight:500;font-size:.82rem">X multiplier</label><select id="xScale"><option value="0.01">× 0.01</option><option value="0.1">× 0.1</option><option value="1" selected>× 1</option><option value="10">× 10</option><option value="100">× 100</option></select></div><div><label for="yScale" style="font-weight:500;font-size:.82rem">Y multiplier</label><select id="yScale"><option value="0.01">× 0.01</option><option value="0.1">× 0.1</option><option value="1" selected>× 1</option><option value="10">× 10</option><option value="100">× 100</option></select></div></div></div>
+        <p class="note" style="margin-bottom:0">Try multiplying X by 10. The covariance becomes 10 times larger, but <em>r</em> stays the same. Standardize the axes to see both variables measured in standard deviations.</p>
+      </section>
+    </div>
+  </div>
+  <section class="panel foot">
+    <h2>Three ideas to remember</h2>
+    <div class="footergrid">
+      <div><strong>1. Direction</strong><p>Positive covariance: high X tends to accompany high Y. Negative covariance: high X tends to accompany low Y.</p></div>
+      <div><strong>2. Measurement scale</strong><p>Covariance changes if you change units. Correlation is standardized and does not change under positive rescaling.</p></div>
+      <div><strong>3. Linear, not necessarily causal</strong><p>A correlation of zero does not rule out a nonlinear relationship. Neither covariance nor correlation alone establishes causation.</p></div>
+    </div>
+  </section>
+</main>
+<script>
+(() => {
+'use strict';
+const svg = document.getElementById('plot');
+const zButton = document.getElementById('zToggle');
+const resetButton = document.getElementById('resetBtn');
+const presetSelect = document.getElementById('preset');
+const xScaleSelect = document.getElementById('xScale');
+const yScaleSelect = document.getElementById('yScale');
+const dims={l:76,r:710,t:24,b:486}, W=dims.r-dims.l,H=dims.b-dims.t;
+const NS='http://www.w3.org/2000/svg';
+const add=(tag,attrs={},text=null,parent=svg)=>{const e=document.createElementNS(NS,tag);Object.entries(attrs).forEach(([k,v])=>e.setAttribute(k,String(v)));if(text!==null)e.textContent=text;parent.appendChild(e);return e;};
+const clamp=(n,a,b)=>Math.min(b,Math.max(a,n));
+const mean=a=>a.reduce((s,v)=>s+v,0)/a.length;
+const stats=(points)=>{const xs=points.map(p=>p.x),ys=points.map(p=>p.y),mx=mean(xs),my=mean(ys);let xx=0,yy=0,xy=0;for(const p of points){xx+=(p.x-mx)**2;yy+=(p.y-my)**2;xy+=(p.x-mx)*(p.y-my);}const n=points.length;const sx=Math.sqrt(xx/(n-1)),sy=Math.sqrt(yy/(n-1));return {mx,my,sx,sy,cov:xy/(n-1),r:sx&&sy?xy/Math.sqrt(xx*yy):NaN,slope:xx?xy/xx:0};};
+// Deterministic illustrative datasets so reset always restores the same demonstration.
+const noise=[.18,-.55,.5,-.29,.69,-.42,.13,.38,-.70,.51,-.18,.46,-.33,.29,-.48,.15,.57,-.1,.36,-.61,.26,-.41,.6,-.20];
+const getPreset=name=>Array.from({length:24},(_,i)=>{const x=9+82*i/23;let y;
+ switch(name){case 'strongPos':y=12+.80*x+noise[i]*7;break;
+ case 'weakPos':y=35+.28*x+noise[i]*35;break;
+ case 'strongNeg':y=91-.78*x+noise[i]*7;break;
+ case 'weakNeg':y=70-.28*x+noise[i]*35;break;
+ case 'none':y=50+noise[(i*7)%24]*35;break;
+ case 'curve':y=10+.035*(x-50)**2+noise[i]*8;break;
+ default:y=12+.80*x+noise[i]*7;}
+ return{x, y:clamp(y,2,98)};});
+let points=getPreset('strongPos');let standardized=false;let dragIndex=null;let current={};
+const fmt=(v, digits=2)=>Number.isFinite(v)?Number(v.toFixed(digits)).toLocaleString('en-US',{maximumFractionDigits:digits}):'undefined';
+const getMeasures=()=>{let xMul=+xScaleSelect.value,yMul=+yScaleSelect.value;const originals=points.map(p=>({x:p.x*xMul,y:p.y*yMul}));const raw=stats(originals);const display=standardized?originals.map(p=>({x:raw.sx?(p.x-raw.mx)/raw.sx:0,y:raw.sy?(p.y-raw.my)/raw.sy:0})):originals;return{raw,display,shown:stats(display),xMul,yMul};};
+const niceStep=range=>{const rough=range/6,pow=10**Math.floor(Math.log10(Math.max(rough,1e-12)));const norm=rough/pow;return(norm<=1?1:norm<=2?2:norm<=5?5:10)*pow;};
+const getDomain=(vals,forceZero=false)=>{if(forceZero){return[-3.5,3.5]}const lo=Math.min(...vals),hi=Math.max(...vals);const pad=Math.max((hi-lo)*.14,Math.abs(hi)*.06,0.01);return [Math.min(0,lo-pad),hi+pad];};
+function render(){const {raw,display,shown,xMul,yMul}=getMeasures();let dx,dy;
+ if(standardized){dx=[-3,3];dy=[-3,3];}else{dx=[0,100*xMul];dy=[0,100*yMul];}
+ const xTo=v=>dims.l+(v-dx[0])/(dx[1]-dx[0])*W, yTo=v=>dims.b-(v-dy[0])/(dy[1]-dy[0])*H;
+ current={xTo,yTo,dx,dy,xMul,yMul,raw};svg.replaceChildren();
+ add('rect',{x:dims.l,y:dims.t,width:W,height:H,fill:'#fff',stroke:'#cbd5e1','stroke-width':1.1});
+ function grid(axis){const dom=axis==='x'?dx:dy,step=standardized?1:niceStep(dom[1]-dom[0]);const first=Math.ceil((dom[0]-1e-10)/step)*step;let count=0;for(let v=first;v<=dom[1]+step*1e-8&&count++<20;v+=step){const tick=Math.abs(v)<step*.001?0:v;
+  if(axis==='x'){const px=xTo(tick);add('line',{x1:px,y1:dims.t,x2:px,y2:dims.b,class:'gridline'});add('text',{x:px,y:dims.b+23,'text-anchor':'middle',class:'tick-text'},fmt(tick,Math.abs(step)<1?3:1));}
+  else{const py=yTo(tick);add('line',{x1:dims.l,y1:py,x2:dims.r,y2:py,class:'gridline'});add('text',{x:dims.l-11,y:py+4,'text-anchor':'end',class:'tick-text'},fmt(tick,Math.abs(step)<1?3:1));}
+ }}grid('x');grid('y');
+ add('line',{x1:xTo(shown.mx),y1:dims.t,x2:xTo(shown.mx),y2:dims.b,class:'meanline'});add('line',{x1:dims.l,y1:yTo(shown.my),x2:dims.r,y2:yTo(shown.my),class:'meanline'});
+ if(shown.sx>1e-10&&shown.sy>1e-10){let a=dx[0],b=dx[1];const sy1=shown.my+shown.slope*(a-shown.mx),sy2=shown.my+shown.slope*(b-shown.mx);
+ const cl=add('clipPath',{id:'graph-clip'});add('rect',{x:dims.l,y:dims.t,width:W,height:H},null,cl);add('line',{x1:xTo(a),y1:yTo(sy1),x2:xTo(b),y2:yTo(sy2),class:'regline','clip-path':'url(#graph-clip)'});}
+ display.forEach((p,i)=>{const c=add('circle',{cx:xTo(p.x),cy:yTo(p.y),r:7.7,class:'dot',role:'button',tabindex:0,'aria-label':`Observation ${i+1}; X ${fmt(p.x)}; Y ${fmt(p.y)}. Drag to reposition.`});c.dataset.index=i;c.addEventListener('pointerdown',e=>{dragIndex=i;c.classList.add('active');svg.setPointerCapture(e.pointerId);e.preventDefault();});c.addEventListener('keydown',e=>{const step=e.shiftKey?5:1;let x=0,y=0;if(e.key==='ArrowLeft')x=-step;if(e.key==='ArrowRight')x=step;if(e.key==='ArrowUp')y=step;if(e.key==='ArrowDown')y=-step;if(!x&&!y)return;e.preventDefault();points[i].x=clamp(points[i].x+x,1,99);points[i].y=clamp(points[i].y+y,1,99);render();const newPoint=svg.querySelectorAll('.dot')[i];newPoint?.focus();});});
+ add('text',{x:(dims.l+dims.r)/2,y:543,'text-anchor':'middle',class:'axis-text'},standardized?'X (z-score; SD units)':`X (original value × ${fmt(xMul,2)})`);
+ add('text',{x:22,y:(dims.t+dims.b)/2,'text-anchor':'middle',transform:`rotate(-90 22 ${(dims.t+dims.b)/2})`,class:'axis-text'},standardized?'Y (z-score; SD units)':`Y (original value × ${fmt(yMul,2)})`);
+ const resultCov=standardized?shown.cov:raw.cov;
+ document.getElementById('covValue').textContent=fmt(resultCov,standardized?3:3);
+ document.getElementById('rValue').textContent=fmt(raw.r,3);
+ document.getElementById('covUnit').textContent=standardized?'z(X) × z(Y) = Pearson r':'scaled X units × scaled Y units';
+ document.getElementById('modeStatus').textContent=standardized?'Standardized values: each axis shows deviations from its mean in sample SD units.':'Raw values: axes show the selected measurement units.';
+ const magnitude=Math.abs(raw.r);const strength=magnitude>=.8?'very strong':magnitude>=.5?'moderate to strong':magnitude>=.25?'weak to moderate':'weak or negligible';
+ const dir=raw.r>.05?'positive':raw.r<-.05?'negative':'approximately zero';
+ document.getElementById('interpretation').textContent=Number.isFinite(raw.r)?`The current data have a ${strength} ${dir} linear relationship (r = ${fmt(raw.r,3)}). The sign of covariance and r agrees; only covariance depends on scale.`:'Correlation is undefined when either variable has no variation.';
+ zButton.textContent=standardized?'Switch back to raw units':'Switch axes to z-scores';zButton.setAttribute('aria-pressed',String(standardized));
+}
+function movePoint(e){if(dragIndex===null)return;const r=svg.getBoundingClientRect(),px=(e.clientX-r.left)*750/r.width,py=(e.clientY-r.top)*560/r.height;const {dx,dy,xMul,yMul,raw}=current;const valueX=dx[0]+(px-dims.l)/W*(dx[1]-dx[0]);const valueY=dy[0]+(dims.b-py)/H*(dy[1]-dy[0]);const originalX=standardized?(valueX*raw.sx+raw.mx)/xMul:valueX/xMul;const originalY=standardized?(valueY*raw.sy+raw.my)/yMul:valueY/yMul;points[dragIndex]={x:clamp(originalX,1,99),y:clamp(originalY,1,99)}; // Data are stored in original base units.
+ render();
+}
+svg.addEventListener('pointermove',e=>{if(dragIndex!==null)movePoint(e);});
+svg.addEventListener('pointerup',()=>{dragIndex=null;});
+svg.addEventListener('pointercancel',()=>{dragIndex=null;});
+zButton.addEventListener('click',()=>{standardized=!standardized;dragIndex=null;render();});
+resetButton.addEventListener('click',()=>{points=getPreset(presetSelect.value);dragIndex=null;render();});
+presetSelect.addEventListener('change',()=>{points=getPreset(presetSelect.value);dragIndex=null;render();});
+xScaleSelect.addEventListener('change',render);yScaleSelect.addEventListener('change',render);
+render();
+})();
+</script>
+</body>
+</html>
